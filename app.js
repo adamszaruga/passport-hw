@@ -6,7 +6,6 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const Database = require('./db.js');
-const router = require('./router');
 
 let db = new Database();
 let app = express();
@@ -14,6 +13,8 @@ let app = express();
 app.use(bodyParser.json());
 app.use(session({secret: 'mymilkshakebringsalltheboystotheyard'}));
 app.set('view engine', 'ejs');
+
+
 
 passport.use(new LocalStrategy(
     {
@@ -50,25 +51,28 @@ passport.deserializeUser(function(userId, done){
 
 // Now that Passport is all set up, here are the API routes
 
+// Homepage
 app.get('/', function(req, res, next) {
     res.render('index', {
         isLoggedIn: req.isAuthenticated()
     });
 });
 
-
+// Login
 app.post('/auth/login', passport.authenticate('local', { failureRedirect: '/'}), function(req, res, next){
     res.json({status: 'OK'});
 });
+
+// Logout
 app.get('/auth/logout', function (req, res, next) {
     req.logout();
     res.json({status: 'OK'});
 });
+
+// Register
 app.post('/auth/register', function (req, res, next) {
     let creds = req.body;
 
-    console.log('creds');
-    console.log(creds);
     db.findUserByEmail(creds.email).then(function(user){
         console.log(user);
         if (!user) {
