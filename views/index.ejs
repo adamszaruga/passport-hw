@@ -1,0 +1,60 @@
+<h1>
+    <% if(isLoggedIn) { %>
+        Logged In!
+    <% } else { %>
+        Not Logged In
+    <% } %>
+</h1>
+
+<form id="login">
+    <input type="text" name="email" placeholder="email" />
+    <input type="text" name="password" placeholder="password" />
+    <button type="submit">Log In</button>
+    <button id="logout" type="button">Log Out</button>
+</form>
+
+
+<form id="register">
+    <input type="text" name="email" placeholder="email" />
+    <input type="text" name="password" placeholder="password" />
+    <button type="submit">Register</button>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script>
+    var loginForm = document.getElementById('login');
+    var registerForm = document.getElementById('register');
+    var logoutButton = document.getElementById('logout');
+
+
+    registerForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var registerFormValues = new FormData(registerForm);
+        var email = registerFormValues.get('email');
+        var password = registerFormValues.get('password');
+        axios.post('/auth/register', { email: email, password: password }).then(function(response) {
+            var user = response.data.user;
+            alert(`Account created for ${user.email}`);
+        }).catch(function(){
+            alert(`That user is already registered`);
+        })
+    });
+
+    loginForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var loginFormValues = new FormData(loginForm);
+        var email = loginFormValues.get('email');
+        var password = loginFormValues.get('password');
+        axios.post('/auth/login', { email: email, password: password }).then(function(response){
+            window.location.reload();
+        })
+    });
+
+    logoutButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        axios.get('/auth/logout').then(function (response) {
+            window.location.reload();
+        });
+    })
+
+</script>
